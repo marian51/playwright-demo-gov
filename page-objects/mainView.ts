@@ -1,12 +1,16 @@
 import { expect, Locator, Page } from '@playwright/test';
+import { BasePage } from './basePage';
 
-export class MainView {
-  private readonly page: Page;
+export class MainView extends BasePage {
   private readonly footerLogotypes: Locator;
+  private readonly searchInput: Locator;
+  private readonly searchButton: Locator;
 
   constructor(page: Page) {
-    this.page = page;
+    super(page);
     this.footerLogotypes = this.page.locator('.eu-logotypes');
+    this.searchInput = this.page.locator('#query');
+    this.searchButton = this.page.locator('//form/button');
   }
 
   async goToMainView() {
@@ -26,10 +30,12 @@ export class MainView {
     await this.page.waitForLoadState('domcontentloaded');
   }
 
-  async verifyPageTitle(pageTitle: string) {
-    const currentPageTitle: string = await this.page.title();
-    expect(currentPageTitle).toBeTruthy();
-    expect(currentPageTitle).toBe(pageTitle);
+  async fillSearchInput(searchText: string) {
+    await this.searchInput.fill(searchText);
+  }
+
+  async clickSearchButton() {
+    await this.searchButton.click();
   }
 
   async verifyFooterLogotypesDisplayed() {
