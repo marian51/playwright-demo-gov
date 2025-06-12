@@ -1,11 +1,11 @@
 import { expect, Locator, Page } from '@playwright/test';
+import { BasePage } from './basePage';
 
-export class MainView {
-  private readonly page: Page;
+export class MainView extends BasePage {
   private readonly footerLogotypes: Locator;
 
   constructor(page: Page) {
-    this.page = page;
+    super(page);
     this.footerLogotypes = this.page.locator('.eu-logotypes');
   }
 
