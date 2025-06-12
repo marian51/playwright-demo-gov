@@ -9,7 +9,8 @@ export class SearchResultsView extends BasePage {
 
   private readonly administrationUnitSearchInput: Locator;
 
-  private administrationUnitSearchOption: Locator;
+  private filteringOption: Locator;
+  private periods: Map<string, number>;
 
   constructor(page: Page) {
     super(page);
@@ -19,6 +20,12 @@ export class SearchResultsView extends BasePage {
     this.resultsList = this.page.locator('//*[contains(@class, "search-results__list result-list")]');
 
     this.administrationUnitSearchInput = this.page.locator('#custom-select-ministryid-dropdown').getByRole('textbox', { name: 'szukaj...' });
+
+    this.periods = new Map<string, number>();
+    this.periods.set('Ostatni rok', 365);
+    this.periods.set('Ostatnie 30 dni', 30);
+    this.periods.set('Ostatnie 7 dni', 7);
+    this.periods.set('Ostatnie 90 dni', 90);
   }
 
   async waitForResultsLoad() {
@@ -30,8 +37,13 @@ export class SearchResultsView extends BasePage {
   }
 
   async selectAdministrationUnitSearchOption(optionText: string) {
-    this.administrationUnitSearchOption = this.page.getByRole('option', { name: optionText });
-    await this.administrationUnitSearchOption.click();
+    this.filteringOption = this.page.getByRole('option', { name: optionText });
+    await this.filteringOption.click();
+  }
+
+  async selectPeriodOption(optionText: string) {
+    this.filteringOption = this.page.locator('#custom-select-period-dropdown').getByText(optionText);
+    await this.filteringOption.click();
   }
 
   async verifyCounterNumberIsNotZero() {
@@ -64,6 +76,20 @@ export class SearchResultsView extends BasePage {
     resultsUnits.forEach((unit) => {
       const cleanedUnit = unit.split('/ ')[1].trim();
       expect(cleanedUnit).not.toBe(administrationUnit.trim());
+    });
+  }
+
+  async verifyResultsAreInPeriod(givenPeriod: string) {
+    let daysPeriod = this.periods.get(givenPeriod) ?? 0;
+    daysPeriod = daysPeriod * 24 * 60 * 60 * 1000;
+    const resultsUnits = await this.resultsList.locator('//ul/li/span').allTextContents();
+    resultsUnits.forEach((unit) => {
+      const dateString = unit.split('/ ')[0].trim();
+      const [month, day, year] = dateString.split('/').map(Number);
+      const date = new Date(year, month - 1, day + 1);
+      const dateToday = new Date();
+
+      expect(date.getTime()).toBeGreaterThan(dateToday.getTime() - daysPeriod);
     });
   }
 }
