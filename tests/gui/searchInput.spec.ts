@@ -2,7 +2,7 @@ import test from '@playwright/test';
 import { MainView } from '../../page-objects/mainView';
 import { SearchResultsView } from '../../page-objects/searchResultsView';
 
-test.describe('Tests for checking if searching works correct', { tag: ['@search'] }, async () => {
+test.describe('Tests for checking if searching and filtering works correct', { tag: ['@search'] }, async () => {
   let mainView: MainView;
   let searchResultsView: SearchResultsView;
 
@@ -46,20 +46,23 @@ test.describe('Tests for checking if searching works correct', { tag: ['@search'
     'Basic test for checking if filtering by "Administration unit" works correct',
     { tag: ['@filtering', '@filter-admin-unit'] },
     async ({ page }) => {
+      const searchPhrase = 'dofinansowanie';
+      const filterAdministrationUnit = 'Ministerstwo Klimatu i Środowiska';
+
       await test.step('Going to main website and typing search phrase', async () => {
-        await mainView.fillSearchInput('dofinansowanie');
+        await mainView.fillSearchInput(searchPhrase);
         await mainView.clickSearchButton();
       });
 
       await test.step('Filter results by "Administration unit"', async () => {
         await searchResultsView.clickElementByText('Jednostka administracji');
-        await searchResultsView.fillAdministrationSearchInput('Ministerstwo Klimatu i Środowiska');
-        await searchResultsView.selectAdministrationUnitSearchOption('Ministerstwo Klimatu i Środowiska');
+        await searchResultsView.fillAdministrationSearchInput(filterAdministrationUnit);
+        await searchResultsView.selectAdministrationUnitSearchOption(filterAdministrationUnit);
       });
 
       await test.step('Checking if results have only filtered administration unit', async () => {
         await page.waitForTimeout(1000);
-        await searchResultsView.verifyResultsHaveAdministrationUnit('Ministerstwo Klimatu i Środowiska');
+        await searchResultsView.verifyResultsHaveAdministrationUnit(filterAdministrationUnit);
       });
 
       await test.step('Checking if results do not have other administration unit', async () => {
@@ -69,19 +72,22 @@ test.describe('Tests for checking if searching works correct', { tag: ['@search'
   );
 
   test('Basic test for checking if filtering by "Period" works correct', { tag: ['@filtering', '@filter-period'] }, async ({ page }) => {
+    const searchPhrase = 'dofinansowanie';
+    const filterPeriod = 'Ostatnie 7 dni';
+
     await test.step('Going to main website and typing search phrase', async () => {
-      await mainView.fillSearchInput('dofinansowanie');
+      await mainView.fillSearchInput(searchPhrase);
       await mainView.clickSearchButton();
     });
 
     await test.step('Filter results by "Period"', async () => {
       await searchResultsView.clickElementByText('Okres');
-      await searchResultsView.selectPeriodOption('Ostatnie 7 dni');
+      await searchResultsView.selectPeriodOption(filterPeriod);
     });
 
     await test.step('Checking if results have only selected period', async () => {
       await page.waitForTimeout(1000);
-      await searchResultsView.verifyResultsAreInPeriod('Ostatnie 7 dni');
+      await searchResultsView.verifyResultsAreInPeriod(filterPeriod);
     });
   });
 
@@ -89,31 +95,34 @@ test.describe('Tests for checking if searching works correct', { tag: ['@search'
     'Basic test for checking if filtering both by "Period" and "Administration unit" works correct',
     { tag: ['@filtering', '@filter-both'] },
     async ({ page }) => {
+      const searchPhrase = 'dofinansowanie';
+      const filterAdministrationUnit = 'Ministerstwo Klimatu i Środowiska';
+      const filterPeriod = 'Ostatni rok';
+
       await test.step('Going to main website and typing search phrase', async () => {
-        await mainView.fillSearchInput('dofinansowanie');
+        await mainView.fillSearchInput(searchPhrase);
         await mainView.clickSearchButton();
       });
 
       await test.step('Filter results by "Period"', async () => {
         await searchResultsView.clickElementByText('Okres');
-        await searchResultsView.selectPeriodOption('Ostatni rok');
+        await searchResultsView.selectPeriodOption(filterPeriod);
       });
 
       await test.step('Filter results by "Administration unit"', async () => {
         await searchResultsView.clickElementByText('Jednostka administracji');
-        await searchResultsView.fillAdministrationSearchInput('Ministerstwo Klimatu i Środowiska');
-        await searchResultsView.selectAdministrationUnitSearchOption('Ministerstwo Klimatu i Środowiska');
+        await searchResultsView.fillAdministrationSearchInput(filterAdministrationUnit);
+        await searchResultsView.selectAdministrationUnitSearchOption(filterAdministrationUnit);
       });
 
       await test.step('Checking if results have only selected period', async () => {
         await page.waitForTimeout(1000);
         await searchResultsView.verifyCounterNumberIsNotZero();
-        await searchResultsView.verifyResultsAreInPeriod('Ostatni rok');
+        await searchResultsView.verifyResultsAreInPeriod(filterPeriod);
       });
 
       await test.step('Checking if results have only filtered administration unit', async () => {
-        await page.waitForTimeout(1000);
-        await searchResultsView.verifyResultsHaveAdministrationUnit('Ministerstwo Klimatu i Środowiska');
+        await searchResultsView.verifyResultsHaveAdministrationUnit(filterAdministrationUnit);
       });
 
       await test.step('Checking if results do not have other administration unit', async () => {
