@@ -11,10 +11,10 @@ test.describe('Basic tests for checking if main website is loaded correctly', { 
     const pageStatus = await mainView.getResStatus();
 
     // Checking page title
-    await mainView.verifyPageTitle('Portal Gov.pl');
+    await mainView.verifyPageTitle('Portal Gov.pl'); // Assertion inside class file
 
     // Checking response status
-    expect(pageStatus).toBe(200);
+    expect(pageStatus).toBe(200); // Assertion inside test file
 
     // Checking visibility of some elements
     await mainView.verifyFooterLogotypesDisplayed();
