@@ -12,7 +12,7 @@ test.describe('Tests for checking if searching works correct', { tag: ['@search'
     await mainView.goToMainView();
   });
 
-  test('Basic test for checking if searching works', async ({ page }) => {
+  test('Basic test for checking if searching works', async () => {
     await test.step('Going to main website and typing search phrase', async () => {
       await mainView.fillSearchInput('dofinansowanie');
       await mainView.clickSearchButton();
@@ -39,6 +39,28 @@ test.describe('Tests for checking if searching works correct', { tag: ['@search'
       await searchResultsView.verifyResultNotExistInList('Reforma edukacji');
       await searchResultsView.verifyResultNotExistInList('Reforma jest niezbędna');
       await searchResultsView.verifyResultNotExistInList('Reforma planowania przestrzennego');
+    });
+  });
+
+  test('Basic test for checking if filtering by "Administration unit" works correct', { tag: ['@filtering'] }, async ({ page }) => {
+    await test.step('Going to main website and typing search phrase', async () => {
+      await mainView.fillSearchInput('dofinansowanie');
+      await mainView.clickSearchButton();
+    });
+
+    await test.step('Filter results by "Administration unit"', async () => {
+      await searchResultsView.clickElementByText('Jednostka administracji');
+      await searchResultsView.fillAdministrationSearchInput('Ministerstwo Klimatu i Środowiska');
+      await searchResultsView.selectAdministrationUnitSearchOption('Ministerstwo Klimatu i Środowiska');
+    });
+
+    await test.step('Checking if results have only filtered administration unit', async () => {
+      await page.waitForTimeout(1000);
+      await searchResultsView.verifyResultsHaveAdministrationUnit('Ministerstwo Klimatu i Środowiska');
+    });
+
+    await test.step('Checking if results do not have other administration unit', async () => {
+      await searchResultsView.verifyResultsDoesNotHaveAdministrationUnit('Narodowy Fundusz Ochrony Środowiska i Gospodarki Wodnej');
     });
   });
 });
