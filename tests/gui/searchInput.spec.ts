@@ -42,27 +42,31 @@ test.describe('Tests for checking if searching works correct', { tag: ['@search'
     });
   });
 
-  test('Basic test for checking if filtering by "Administration unit" works correct', { tag: ['@filtering'] }, async ({ page }) => {
-    await test.step('Going to main website and typing search phrase', async () => {
-      await mainView.fillSearchInput('dofinansowanie');
-      await mainView.clickSearchButton();
-    });
+  test(
+    'Basic test for checking if filtering by "Administration unit" works correct',
+    { tag: ['@filtering', '@filter-admin-unit'] },
+    async ({ page }) => {
+      await test.step('Going to main website and typing search phrase', async () => {
+        await mainView.fillSearchInput('dofinansowanie');
+        await mainView.clickSearchButton();
+      });
 
-    await test.step('Filter results by "Administration unit"', async () => {
-      await searchResultsView.clickElementByText('Jednostka administracji');
-      await searchResultsView.fillAdministrationSearchInput('Ministerstwo Klimatu i Środowiska');
-      await searchResultsView.selectAdministrationUnitSearchOption('Ministerstwo Klimatu i Środowiska');
-    });
+      await test.step('Filter results by "Administration unit"', async () => {
+        await searchResultsView.clickElementByText('Jednostka administracji');
+        await searchResultsView.fillAdministrationSearchInput('Ministerstwo Klimatu i Środowiska');
+        await searchResultsView.selectAdministrationUnitSearchOption('Ministerstwo Klimatu i Środowiska');
+      });
 
-    await test.step('Checking if results have only filtered administration unit', async () => {
-      await page.waitForTimeout(1000);
-      await searchResultsView.verifyResultsHaveAdministrationUnit('Ministerstwo Klimatu i Środowiska');
-    });
+      await test.step('Checking if results have only filtered administration unit', async () => {
+        await page.waitForTimeout(1000);
+        await searchResultsView.verifyResultsHaveAdministrationUnit('Ministerstwo Klimatu i Środowiska');
+      });
 
-    await test.step('Checking if results do not have other administration unit', async () => {
-      await searchResultsView.verifyResultsDoesNotHaveAdministrationUnit('Narodowy Fundusz Ochrony Środowiska i Gospodarki Wodnej');
-    });
-  });
+      await test.step('Checking if results do not have other administration unit', async () => {
+        await searchResultsView.verifyResultsDoesNotHaveAdministrationUnit('Narodowy Fundusz Ochrony Środowiska i Gospodarki Wodnej');
+      });
+    },
+  );
 
   test('Basic test for checking if filtering by "Period" works correct', { tag: ['@filtering', '@filter-period'] }, async ({ page }) => {
     await test.step('Going to main website and typing search phrase', async () => {
@@ -79,7 +83,42 @@ test.describe('Tests for checking if searching works correct', { tag: ['@search'
       await page.waitForTimeout(1000);
       await searchResultsView.verifyResultsAreInPeriod('Ostatnie 7 dni');
     });
-
-    await page.pause();
   });
+
+  test(
+    'Basic test for checking if filtering both by "Period" and "Administration unit" works correct',
+    { tag: ['@filtering', '@filter-both'] },
+    async ({ page }) => {
+      await test.step('Going to main website and typing search phrase', async () => {
+        await mainView.fillSearchInput('dofinansowanie');
+        await mainView.clickSearchButton();
+      });
+
+      await test.step('Filter results by "Period"', async () => {
+        await searchResultsView.clickElementByText('Okres');
+        await searchResultsView.selectPeriodOption('Ostatni rok');
+      });
+
+      await test.step('Filter results by "Administration unit"', async () => {
+        await searchResultsView.clickElementByText('Jednostka administracji');
+        await searchResultsView.fillAdministrationSearchInput('Ministerstwo Klimatu i Środowiska');
+        await searchResultsView.selectAdministrationUnitSearchOption('Ministerstwo Klimatu i Środowiska');
+      });
+
+      await test.step('Checking if results have only selected period', async () => {
+        await page.waitForTimeout(1000);
+        await searchResultsView.verifyCounterNumberIsNotZero();
+        await searchResultsView.verifyResultsAreInPeriod('Ostatni rok');
+      });
+
+      await test.step('Checking if results have only filtered administration unit', async () => {
+        await page.waitForTimeout(1000);
+        await searchResultsView.verifyResultsHaveAdministrationUnit('Ministerstwo Klimatu i Środowiska');
+      });
+
+      await test.step('Checking if results do not have other administration unit', async () => {
+        await searchResultsView.verifyResultsDoesNotHaveAdministrationUnit('Narodowy Fundusz Ochrony Środowiska i Gospodarki Wodnej');
+      });
+    },
+  );
 });
