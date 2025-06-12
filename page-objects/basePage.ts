@@ -7,6 +7,10 @@ export abstract class BasePage {
     this.page = page;
   }
 
+  async clickElementByText(givenText: string) {
+    await this.page.getByText(givenText).click();
+  }
+
   async verifyPageTitle(pageTitle: string) {
     const currentPageTitle: string = await this.page.title();
     expect(currentPageTitle).toBeTruthy();
