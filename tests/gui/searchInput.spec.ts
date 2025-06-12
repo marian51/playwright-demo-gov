@@ -63,4 +63,23 @@ test.describe('Tests for checking if searching works correct', { tag: ['@search'
       await searchResultsView.verifyResultsDoesNotHaveAdministrationUnit('Narodowy Fundusz Ochrony Środowiska i Gospodarki Wodnej');
     });
   });
+
+  test('Basic test for checking if filtering by "Period" works correct', { tag: ['@filtering', '@filter-period'] }, async ({ page }) => {
+    await test.step('Going to main website and typing search phrase', async () => {
+      await mainView.fillSearchInput('dofinansowanie');
+      await mainView.clickSearchButton();
+    });
+
+    await test.step('Filter results by "Period"', async () => {
+      await searchResultsView.clickElementByText('Okres');
+      await searchResultsView.selectPeriodOption('Ostatnie 7 dni');
+    });
+
+    await test.step('Checking if results have only selected period', async () => {
+      await page.waitForTimeout(1000);
+      await searchResultsView.verifyResultsAreInPeriod('Ostatnie 7 dni');
+    });
+
+    await page.pause();
+  });
 });
