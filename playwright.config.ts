@@ -15,7 +15,7 @@ export default defineConfig({
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
   /* Opt out of parallel tests on CI. */
-  workers: process.env.CI ? 1 : undefined,
+  workers: process.env.CI ? 1 : Number(process.env.WORKERS),
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [
     ['list', { printSteps: true }],
@@ -28,7 +28,7 @@ export default defineConfig({
       { development: process.env.DEV_BASE_URL, production: process.env.PROD_BASE_URL }[process.env.NODE_ENV as string] || 'https://www.gov.pl/',
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    trace: 'on-first-retry',
+    trace: 'on',
   },
 
   /* Configure projects for major browsers */
